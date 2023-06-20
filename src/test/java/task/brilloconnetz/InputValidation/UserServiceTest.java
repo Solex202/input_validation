@@ -1,10 +1,16 @@
 package task.brilloconnetz.InputValidation;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import task.brilloconnetz.InputValidation.dto.InputDto;
+import task.brilloconnetz.InputValidation.exception.BrilloconnetzException;
 import task.brilloconnetz.InputValidation.service.UserService;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class UserServiceTest {
@@ -16,12 +22,33 @@ public class UserServiceTest {
     @Test
     void testThatCanCreateUser(){
         InputDto dto =  InputDto.builder()
-                .email("")
+                .email("onwukalotachukwu210@gmail.com")
                 .dateOfBirth("21-02-2012")
-                .password("solo")
+                .password("#Solom9n123")
                 .username("solomon")
                 .build();
 
         userService.validateUser(dto);
+
+        assertAll(
+                ()-> assertNotNull(dto),
+                ()-> assertThat(dto.getEmail(), is("onwukalotachukwu210@gmail.com"))
+        );
+
+    }
+
+    @Test
+    @DisplayName("throw exception if email is invalid")
+    void testThatCannotCreateUser(){
+        InputDto dto =  InputDto.builder()
+                .email(".onwukalotachukwu210@gmail.com")
+                .dateOfBirth("21-02-2012")
+                .password("#Solom9n123")
+                .username("solomon")
+                .build();
+
+        ;
+
+        assertThrows(BrilloconnetzException.class,()-> userService.validateUser(dto));
     }
 }
