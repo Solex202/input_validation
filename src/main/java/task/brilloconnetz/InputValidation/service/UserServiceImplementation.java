@@ -5,8 +5,11 @@ import org.springframework.stereotype.Service;
 import task.brilloconnetz.InputValidation.dto.InputDto;
 import task.brilloconnetz.InputValidation.exception.BrilloconnetzException;
 import task.brilloconnetz.InputValidation.model.BrilloconnetzUser;
+import task.brilloconnetz.InputValidation.model.Constant;
 import task.brilloconnetz.InputValidation.repository.UserRepository;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,13 +21,8 @@ public class UserServiceImplementation implements UserService{
     @Override
     public void validateUser(InputDto dto) {
 
-        if(!emailIsValid(dto.getEmail()) || dto.getEmail().isEmpty()) throw new BrilloconnetzException("Email is invalid");
+        validateUserInput(dto);
 
-        if(!passwordIsValid(dto.getPassword()) || dto.getEmail().isEmpty()) throw new BrilloconnetzException("Password must contain at least 1 uppercase,1 lowercase ");
-
-        if(dto.getUsername().length() < 4 || dto.getUsername().isEmpty()) throw new BrilloconnetzException("username must be at greater tha 4");
-
-//        if(dto.getDateOfBirth()
         BrilloconnetzUser user = BrilloconnetzUser.builder()
                 .email(dto.getEmail())
                 .password(dto.getPassword())
@@ -33,7 +31,21 @@ public class UserServiceImplementation implements UserService{
 
         userRepository.save(user);
 
+    }
 
+    private void validateUserInput(InputDto dto) {
+        if(!emailIsValid(dto.getEmail()) || dto.getEmail().isEmpty()) throw new BrilloconnetzException("Email is invalid");
+
+        if(!passwordIsValid(dto.getPassword()) || dto.getEmail().isEmpty()) throw new BrilloconnetzException("strong password with at least 1 upper case, 1 special , 1 number and must be minimum of 8 characters");
+
+        if(dto.getUsername().length() < Constant.USERNAME_MIN_LENGTH || dto.getUsername().isEmpty()) throw new BrilloconnetzException("username must be at greater tha 4");
+
+        LocalDate dob = LocalDate.parse(dto.getDateOfBirth());
+        LocalDate curDate = LocalDate.now();
+        Period period = Period.between(dob, curDate);
+        if(period.getYears() < Constant.AGE_LIMIT){
+            throw new BrilloconnetzException("user must be 16 years and above");
+        }
     }
 
     private boolean passwordIsValid(String password) {
@@ -43,13 +55,11 @@ public class UserServiceImplementation implements UserService{
 
         return matcher.matches();
     }
-
     private boolean emailIsValid(String email) {
-        String regex = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
+        String regex = "[a-zA-z][\\w-]{1,20}@\\w{2,20}\\.\\w{2,3}$";
         Pattern pattern  = Pattern.compile(regex);
         Matcher matcher =  pattern.matcher(email);
 
         return matcher.matches();
-
     }
 }

@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
+import java.time.LocalDate;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,6 +19,6 @@ public class BrilloconnetzUser {
 
     private String username;
     private String password;
-    private String dateOfBirth;
+    private LocalDate dateOfBirth;
 
 }
