@@ -1,5 +1,6 @@
 package task.brilloconnetz.InputValidation;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,23 +17,27 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@Slf4j
 public class UserServiceTest {
     @Autowired
     private UserService userService;
     @Test
     void testThatCanCreateUser() throws ParseException {
+        String val = String.valueOf(LocalDate.of(2002, 6,22));
         InputDto dto =  InputDto.builder()
-                .email("amakalotachukwu210@gmail.com")
-                .dateOfBirth(String.valueOf(LocalDate.of(2002, 6,22)))
+                .email("ammmakalotachukwu210@gmail.com")
+                .dateOfBirth(String.valueOf(LocalDate.of(2002, 06,22)))
                 .password("#Solom9n123")
-                .username("deeaswe")
+                .username("deeaswegg")
                 .build();
+
+        log.info("VALUE {}", val);
 
         String result = userService.registerUser(dto);
 
         assertAll(
                 ()-> assertNotNull(dto),
-                ()-> assertThat(dto.getEmail(), is("amakalotachukwu210@gmail.com")),
+                ()-> assertThat(dto.getEmail(), is("ammmakalotachukwu210@gmail.com")),
                 ()-> assertEquals(result, "Verification passed")
         );
 

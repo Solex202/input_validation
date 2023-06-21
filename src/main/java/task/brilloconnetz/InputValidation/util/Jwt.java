@@ -6,17 +6,20 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.util.Date;
 @Slf4j
 @Service
-public class JwtUtil {
-
-    static String secretKey = "3979244226452948404D635166546A576D5A7134743777217A25432A462D4A61";
-    public static String generateJWT( String userId) {
+@AllArgsConstructor
+public class Jwt {
+    private final JwtUtil jwtUtil;
+//    static String secretKey = "3979244226452948404D635166546A576D5A7134743777217A25432A462D4A61";
+    public String generateJWT( String userId) {
 
         long expirationMillis = 3600000; //  1 hour
 
@@ -34,8 +37,9 @@ public class JwtUtil {
 
         return jwt;
     }
-    private static Key getSignInKey(){
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+
+    private Key getSignInKey(){
+        byte[] keyBytes = Decoders.BASE64.decode(jwtUtil.getSecret());
         return Keys.hmacShaKeyFor(keyBytes);
     }
     public static String verifyJWT(String jwt, String secretKey) {

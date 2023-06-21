@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import task.brilloconnetz.InputValidation.util.JwtUtil;
+import task.brilloconnetz.InputValidation.util.Jwt;
 import task.brilloconnetz.InputValidation.dto.InputDto;
 import task.brilloconnetz.InputValidation.exception.BrilloconnetzException;
 import task.brilloconnetz.InputValidation.model.BrilloconnetzUser;
@@ -25,8 +25,10 @@ public class UserServiceImplementation implements UserService{
         @Autowired
         private ModelMapper mapper;
 
+//        private Jwt jwt;
+
         @Autowired
-        JwtUtil jwt;
+        private Jwt jwt;
     @Override
     public String registerUser(InputDto dto) throws ParseException {
 
@@ -39,9 +41,9 @@ public class UserServiceImplementation implements UserService{
         user.setDateOfBirth(LocalDate.parse(dto.getDateOfBirth()));
         BrilloconnetzUser brilloconnetzUser = userRepository.save(user);
 
-        var value= JwtUtil.generateJWT( brilloconnetzUser.getId());
+        var value= jwt.generateJWT(brilloconnetzUser.getId());
 //        log.info(value);
-        String subject = JwtUtil.verifyJWT(value, "3979244226452948404D635166546A576D5A7134743777217A25432A462D4A61");
+        String subject = Jwt.verifyJWT(value, "3979244226452948404D635166546A576D5A7134743777217A25432A462D4A61");
         if (subject == null || !subject.equals(brilloconnetzUser.getId())) {
             return "Verification failed";
         }
