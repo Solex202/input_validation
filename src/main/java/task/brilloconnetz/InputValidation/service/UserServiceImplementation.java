@@ -27,6 +27,7 @@ public class UserServiceImplementation implements UserService{
                 .email(dto.getEmail())
                 .password(dto.getPassword())
                 .username(dto.getUsername())
+                .dateOfBirth(LocalDate.parse(dto.getDateOfBirth()))
                 .build();
 
         userRepository.save(user);
@@ -34,6 +35,8 @@ public class UserServiceImplementation implements UserService{
     }
 
     private void validateUserInput(InputDto dto) {
+        if(emailAlreadyExist(dto.getEmail()) || usernameAlreadyExist(dto.getUsername())) throw new BrilloconnetzException("Email already exist");
+
         if(!emailIsValid(dto.getEmail()) || dto.getEmail().isEmpty()) throw new BrilloconnetzException("Email is invalid");
 
         if(!passwordIsValid(dto.getPassword()) || dto.getEmail().isEmpty()) throw new BrilloconnetzException("strong password with at least 1 upper case, 1 special , 1 number and must be minimum of 8 characters");
@@ -43,9 +46,16 @@ public class UserServiceImplementation implements UserService{
         LocalDate dob = LocalDate.parse(dto.getDateOfBirth());
         LocalDate curDate = LocalDate.now();
         Period period = Period.between(dob, curDate);
-        if(period.getYears() < Constant.AGE_LIMIT){
-            throw new BrilloconnetzException("user must be 16 years and above");
-        }
+        if(period.getYears() < Constant.AGE_LIMIT) throw new BrilloconnetzException("user must be 16 years and above");
+
+    }
+
+    private boolean usernameAlreadyExist(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+    private boolean emailAlreadyExist(String email) {
+        return userRepository.existsByEmail(email);
     }
 
     private boolean passwordIsValid(String password) {
