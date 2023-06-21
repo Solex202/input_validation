@@ -1,4 +1,4 @@
-package task.brilloconnetz.InputValidation.config;
+package task.brilloconnetz.InputValidation.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -13,12 +13,12 @@ import java.security.Key;
 import java.util.Date;
 @Slf4j
 @Service
-public class GenerateJwt {
+public class JwtUtil {
 
     static String secretKey = "3979244226452948404D635166546A576D5A7134743777217A25432A462D4A61";
     public static String generateJWT( String userId) {
 
-        long expirationMillis = 3600000; // Token expiration time in milliseconds (e.g., 1 hour)
+        long expirationMillis = 3600000; //  1 hour
 
         Date now = new Date();
         Date expiration = new Date(now.getTime() + expirationMillis);
