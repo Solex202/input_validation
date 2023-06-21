@@ -1,20 +1,25 @@
 package task.brilloconnetz.InputValidation.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import task.brilloconnetz.InputValidation.config.GenerateJwt;
 import task.brilloconnetz.InputValidation.dto.InputDto;
 import task.brilloconnetz.InputValidation.exception.BrilloconnetzException;
 import task.brilloconnetz.InputValidation.model.BrilloconnetzUser;
 import task.brilloconnetz.InputValidation.model.Constant;
 import task.brilloconnetz.InputValidation.repository.UserRepository;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
+@Slf4j
 public class UserServiceImplementation implements UserService{
 
         @Autowired
@@ -22,15 +27,28 @@ public class UserServiceImplementation implements UserService{
 
         @Autowired
         private ModelMapper mapper;
+
+        @Autowired
+        GenerateJwt jwt;
     @Override
-    public boolean validateUser(InputDto dto) {
+    public String registerUser(InputDto dto) throws ParseException {
 
         validateUserInput(dto);
 
         BrilloconnetzUser user = mapper.map(dto, BrilloconnetzUser.class);
-        userRepository.save(user);
+//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+//        String dob = simpleDateFormat.format(LocalDate.now());
+//        log.info("");
+        user.setDateOfBirth(LocalDate.parse(dto.getDateOfBirth()));
+        BrilloconnetzUser brilloconnetzUser = userRepository.save(user);
 
-        return true;
+        var value= GenerateJwt.generateJWT( brilloconnetzUser.getId());
+//        log.info(value);
+        String subject = GenerateJwt.verifyJWT(value, "3979244226452948404D635166546A576D5A7134743777217A25432A462D4A61");
+        if (subject == null && !subject.equals(brilloconnetzUser.getId())) {
+            return "Verification failed";
+        }
+        return "Verification passed";
 
     }
     private void validateUserInput(InputDto dto) {

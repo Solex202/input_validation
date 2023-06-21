@@ -1,28 +1,52 @@
 package task.brilloconnetz.InputValidation.config;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
+import java.security.Key;
 import java.util.Date;
-
+@Slf4j
+@Service
 public class GenerateJwt {
 
-    public static String generateJWT() {
-        // Generate the JWT with a secret key
-        String secretKey = "yourSecretKey"; // Replace with your secret key
-        String subject = "userId123"; // Replace with the user ID or relevant information
+    static String secretKey = "3979244226452948404D635166546A576D5A7134743777217A25432A462D4A61";
+    public static String generateJWT( String userId) {
+
         long expirationMillis = 3600000; // Token expiration time in milliseconds (e.g., 1 hour)
 
         Date now = new Date();
         Date expiration = new Date(now.getTime() + expirationMillis);
 
         String jwt = Jwts.builder()
-                .setSubject(subject)
+                .setSubject(userId)
                 .setIssuedAt(now)
                 .setExpiration(expiration)
-                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .signWith(getSignInKey(),SignatureAlgorithm.HS256)
                 .compact();
 
+        log.info("JWT {}", jwt);
+
         return jwt;
+    }
+    private static Key getSignInKey(){
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public static String verifyJWT(String jwt, String secretKey) {
+        try {
+            Jws<Claims> claimsJws = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwt);
+            Claims claims = claimsJws.getBody();
+            String subject = claims.getSubject();
+            return subject;
+        } catch (Exception e) {
+            return "Verification fails";
+        }
     }
 }

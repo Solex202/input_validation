@@ -8,6 +8,7 @@ import task.brilloconnetz.InputValidation.dto.InputDto;
 import task.brilloconnetz.InputValidation.exception.BrilloconnetzException;
 import task.brilloconnetz.InputValidation.service.UserService;
 
+import java.text.ParseException;
 import java.time.LocalDate;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -19,7 +20,7 @@ public class UserServiceTest {
     @Autowired
     private UserService userService;
     @Test
-    void testThatCanCreateUser(){
+    void testThatCanCreateUser() throws ParseException {
         InputDto dto =  InputDto.builder()
                 .email("amakalotachukwu210@gmail.com")
                 .dateOfBirth(String.valueOf(LocalDate.of(2002, 6,22)))
@@ -27,12 +28,12 @@ public class UserServiceTest {
                 .username("deeaswe")
                 .build();
 
-        boolean result = userService.validateUser(dto);
+        String result = userService.registerUser(dto);
 
         assertAll(
                 ()-> assertNotNull(dto),
                 ()-> assertThat(dto.getEmail(), is("amakalotachukwu210@gmail.com")),
-                ()-> assertTrue(result)
+                ()-> assertEquals(result, "Verification passed")
         );
 
     }
@@ -46,7 +47,7 @@ public class UserServiceTest {
                 .username("solomon")
                 .build();
 
-        assertThrows(BrilloconnetzException.class,()-> userService.validateUser(dto));
+        assertThrows(BrilloconnetzException.class,()-> userService.registerUser(dto));
     }
     @Test
     @DisplayName("throw exception if password is invalid")
@@ -58,7 +59,7 @@ public class UserServiceTest {
                 .username("solomon")
                 .build();
 
-        assertThrows(BrilloconnetzException.class,()-> userService.validateUser(dto));
+        assertThrows(BrilloconnetzException.class,()-> userService.registerUser(dto));
     }
     @Test
     @DisplayName("throw exception if username is less than 4")
@@ -70,7 +71,7 @@ public class UserServiceTest {
                 .username("sol")
                 .build();
 
-        assertThrows(BrilloconnetzException.class,()-> userService.validateUser(dto));
+        assertThrows(BrilloconnetzException.class,()-> userService.registerUser(dto));
     }
     @Test
     @DisplayName("throw exception if age is less than 16, age should be greater than or equal to 16")
@@ -82,6 +83,6 @@ public class UserServiceTest {
                 .username("sol")
                 .build();
 
-        assertThrows(BrilloconnetzException.class,()-> userService.validateUser(dto));
+        assertThrows(BrilloconnetzException.class,()-> userService.registerUser(dto));
     }
 }
