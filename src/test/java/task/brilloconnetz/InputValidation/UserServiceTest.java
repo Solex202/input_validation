@@ -26,7 +26,7 @@ public class UserServiceTest {
         String val = String.valueOf(LocalDate.of(2002, 6,22));
         InputDto dto =  InputDto.builder()
                 .email("ammmakalotachukwu210@gmail.com")
-                .dateOfBirth(String.valueOf(LocalDate.of(2002, 06,22)))
+                .dateOfBirth(String.valueOf(LocalDate.of(2002, 6,22)))
                 .password("#Solom9n123")
                 .username("deeaswegg")
                 .build();
@@ -42,6 +42,7 @@ public class UserServiceTest {
         );
 
     }
+
     @Test
     @DisplayName("throw exception if email is invalid")
     void testThatCannotCreateUser(){
@@ -54,6 +55,20 @@ public class UserServiceTest {
 
         assertThrows(BrilloconnetzException.class,()-> userService.registerUser(dto));
     }
+
+    @Test
+    @DisplayName("throw exception if email is invalid")
+    void testThatCannotCreateUser2(){
+        InputDto dto =  InputDto.builder()
+                .email("onwukalotachukwu210gmailcom")
+                .dateOfBirth(String.valueOf(LocalDate.of(2000, 3,22)))
+                .password("#Solom9n123")
+                .username("solomon")
+                .build();
+
+        assertThrows(BrilloconnetzException.class,()-> userService.registerUser(dto));
+    }
+
     @Test
     @DisplayName("throw exception if password is invalid")
     void testThatCannotCreateUser_if_password_is_invalid(){
@@ -66,6 +81,7 @@ public class UserServiceTest {
 
         assertThrows(BrilloconnetzException.class,()-> userService.registerUser(dto));
     }
+
     @Test
     @DisplayName("throw exception if username is less than 4")
     void testThatCannotCreateUser_if_username_is_invalid(){
@@ -78,6 +94,7 @@ public class UserServiceTest {
 
         assertThrows(BrilloconnetzException.class,()-> userService.registerUser(dto));
     }
+
     @Test
     @DisplayName("throw exception if age is less than 16, age should be greater than or equal to 16")
     void testThatCannotCreateUser_if_ageLimit_is_invalid(){
@@ -90,4 +107,31 @@ public class UserServiceTest {
 
         assertThrows(BrilloconnetzException.class,()-> userService.registerUser(dto));
     }
+
+    @Test
+    @DisplayName("throw exception if email already exist in database")
+    void testThatCannotCreateUser3(){
+        InputDto dto =  InputDto.builder()
+                .email("onwukalotachukwu210@gmail.com")
+                .dateOfBirth(String.valueOf(LocalDate.of(2000, 3,22)))
+                .password("#Solom9n123")
+                .username("chima")
+                .build();
+
+        assertThrows(BrilloconnetzException.class,()-> userService.registerUser(dto));
+    }
+
+    @Test
+    @DisplayName("throw exception if username already in use")
+    void testThatCannotCreateUser4(){
+        InputDto dto =  InputDto.builder()
+                .email("glory222@gmail.com")
+                .dateOfBirth(String.valueOf(LocalDate.of(2000, 3,22)))
+                .password("#Thanks2187")
+                .username("solomon")
+                .build();
+
+        assertThrows(BrilloconnetzException.class,()-> userService.registerUser(dto));
+    }
+
 }
