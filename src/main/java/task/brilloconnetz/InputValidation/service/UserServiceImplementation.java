@@ -1,5 +1,6 @@
 package task.brilloconnetz.InputValidation.service;
 
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,45 +11,45 @@ import task.brilloconnetz.InputValidation.exception.BrilloconnetzException;
 import task.brilloconnetz.InputValidation.model.BrilloconnetzUser;
 import task.brilloconnetz.InputValidation.model.Constant;
 import task.brilloconnetz.InputValidation.repository.UserRepository;
+import task.brilloconnetz.InputValidation.util.JwtUtil;
 
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 @Service
 @Slf4j
+@AllArgsConstructor
 public class UserServiceImplementation implements UserService{
         @Autowired
         private UserRepository userRepository;
         @Autowired
         private ModelMapper mapper;
-
-//        private Jwt jwt;
-
         @Autowired
         private Jwt jwt;
+
+        private final JwtUtil jwtUtil;
     @Override
     public String registerUser(InputDto dto) throws ParseException {
 
         validateUserInput(dto);
 
         BrilloconnetzUser user = mapper.map(dto, BrilloconnetzUser.class);
+//        TODO date formatting
 //        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 //        String dob = simpleDateFormat.format(LocalDate.now());
 //        log.info("");
         user.setDateOfBirth(LocalDate.parse(dto.getDateOfBirth()));
         BrilloconnetzUser brilloconnetzUser = userRepository.save(user);
 
-        var value= jwt.generateJWT(brilloconnetzUser.getId());
-//        log.info(value);
-        String subject = Jwt.verifyJWT(value, "3979244226452948404D635166546A576D5A7134743777217A25432A462D4A61");
+        var userJwt= jwt.generateJWT(brilloconnetzUser.getId());
+//        log.info("JWT SECRET KEY ---->{}", jwtUtil.getSecret());
+        String subject = Jwt.verifyJWT(userJwt, jwtUtil.getSecret());
         if (subject == null || !subject.equals(brilloconnetzUser.getId())) {
             return "Verification failed";
         }
         return "Verification passed";
-
     }
     private void validateUserInput(InputDto dto) {
         StringBuilder builder = new StringBuilder();

@@ -18,7 +18,6 @@ import java.util.Date;
 @AllArgsConstructor
 public class Jwt {
     private final JwtUtil jwtUtil;
-//    static String secretKey = "3979244226452948404D635166546A576D5A7134743777217A25432A462D4A61";
     public String generateJWT( String userId) {
 
         long expirationMillis = 3600000; //  1 hour
@@ -33,11 +32,10 @@ public class Jwt {
                 .signWith(getSignInKey(),SignatureAlgorithm.HS256)
                 .compact();
 
-        log.info("JWT {}", jwt);
+        log.info("JWT ---> {}", jwt);
 
         return jwt;
     }
-
     private Key getSignInKey(){
         byte[] keyBytes = Decoders.BASE64.decode(jwtUtil.getSecret());
         return Keys.hmacShaKeyFor(keyBytes);
